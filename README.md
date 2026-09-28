@@ -8,6 +8,13 @@
 Moonlight for Android will allow you to stream your full collection of games from your Windows PC to your Android device,
 whether in your own home or over the internet.
 
+This fork adds an optional **FPV controller layout** for flight simulators, with dual analog sticks, throttle hold, and a
+latching ARM control. It also includes a **compact performance stats overlay** that displays key streaming metrics in a
+space-efficient format.
+
+Enable the FPV layout in **Settings → On-screen Controls**. Enable performance stats and compact mode in **Settings →
+Advanced Settings**; compact mode is available when performance stats are enabled.
+
 Moonlight also has a [PC client](https://github.com/moonlight-stream/moonlight-qt) and [iOS/tvOS client](https://github.com/moonlight-stream/moonlight-ios).
 
 You can follow development on our [Discord server](https://moonlight-stream.org/discord) and help translate Moonlight into your language on [Weblate](https://hosted.weblate.org/projects/moonlight/moonlight-android/).
