@@ -206,7 +206,7 @@
 
     <string name="category_on_screen_controls_settings">On-screen Controls Settings</string>
     <string name="title_checkbox_show_onscreen_controls">Show on-screen controls</string>
-    <string name="summary_checkbox_show_onscreen_controls">Show virtual controller overlay on touchscreen</string>
+    <string name="summary_checkbox_show_onscreen_controls">Show or hide the virtual controller overlay on the touchscreen</string>
     <string name="title_checkbox_vibrate_osc">Enable vibration</string>
     <string name="summary_checkbox_vibrate_osc">Vibrates your device to emulate rumble for the on-screen controls</string>
     <string name="title_only_l3r3">Only show L3 and R3</string>
@@ -217,8 +217,8 @@
     <string name="summary_left_stick_hold_y">Left analog stick Y-axis will not return to center when released (for flight simulators)</string>
     <string name="title_lt_toggle">LT button is a toggle</string>
     <string name="summary_lt_toggle">LT stays pressed until tapped again (for flight sim arm control)</string>
-    <string name="title_osc_layout">FPV controller layout</string>
-    <string name="summary_osc_layout">Enable the FPV flight-sim controller layout and on-screen controls</string>
+    <string name="title_osc_layout">Use FPV controller layout</string>
+    <string name="summary_osc_layout">Choose the FPV flight-sim controls instead of the standard virtual controller</string>
     <string name="title_reset_osc">Clear saved on-screen controls layout</string>
     <string name="summary_reset_osc">Resets all on-screen controls to their default size and position</string>
     <string name="dialog_title_reset_osc">Reset Layout</string>

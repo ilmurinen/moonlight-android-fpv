@@ -277,6 +277,16 @@ public class StreamSettings extends Activity {
             addPreferencesFromResource(R.xml.preferences);
             PreferenceScreen screen = getPreferenceScreen();
 
+            findPreference("checkbox_fpv_layout").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    boolean useFpvLayout = (Boolean) newValue;
+                    ((CheckBoxPreference) findPreference("checkbox_left_stick_hold_y")).setChecked(useFpvLayout);
+                    ((CheckBoxPreference) findPreference("checkbox_lt_toggle")).setChecked(useFpvLayout);
+                    return true;
+                }
+            });
+
             // hide on-screen controls category on non touch screen devices
             if (!getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN)) {
                 PreferenceCategory category =

@@ -86,7 +86,7 @@ public class PreferenceConfiguration {
     private static final boolean DEFAULT_USB_DRIVER = true;
     private static final String DEFAULT_VIDEO_FORMAT = "auto";
 
-    private static final boolean ONSCREEN_CONTROLLER_DEFAULT = false;
+    private static final boolean ONSCREEN_CONTROLLER_DEFAULT = true;
     private static final boolean ONLY_L3_R3_DEFAULT = false;
     private static final boolean SHOW_GUIDE_BUTTON_DEFAULT = true;
     private static final boolean DEFAULT_ENABLE_HDR = false;
@@ -588,8 +588,7 @@ public class PreferenceConfiguration {
         config.multiController = prefs.getBoolean(MULTI_CONTROLLER_PREF_STRING, DEFAULT_MULTI_CONTROLLER);
         config.usbDriver = prefs.getBoolean(USB_DRIVER_PREF_SRING, DEFAULT_USB_DRIVER);
         config.oscLayout = prefs.getBoolean(FPV_LAYOUT_PREF_STRING, true) ? "flight_sim" : "default";
-        config.onscreenController = prefs.getBoolean(ONSCREEN_CONTROLLER_PREF_STRING, ONSCREEN_CONTROLLER_DEFAULT) ||
-                config.oscLayout.equals("flight_sim");
+        config.onscreenController = prefs.getBoolean(ONSCREEN_CONTROLLER_PREF_STRING, ONSCREEN_CONTROLLER_DEFAULT);
         config.onlyL3R3 = prefs.getBoolean(ONLY_L3_R3_PREF_STRING, ONLY_L3_R3_DEFAULT);
         config.showGuideButton = prefs.getBoolean(SHOW_GUIDE_BUTTON_PREF_STRING, SHOW_GUIDE_BUTTON_DEFAULT);
         config.enableHdr = prefs.getBoolean(ENABLE_HDR_PREF_STRING, DEFAULT_ENABLE_HDR) && !isShieldAtvFirmwareWithBrokenHdr();
@@ -604,8 +603,8 @@ public class PreferenceConfiguration {
         config.vibrateFallbackToDevice = prefs.getBoolean(VIBRATE_FALLBACK_PREF_STRING, DEFAULT_VIBRATE_FALLBACK);
         config.vibrateFallbackToDeviceStrength = prefs.getInt(VIBRATE_FALLBACK_STRENGTH_PREF_STRING, DEFAULT_VIBRATE_FALLBACK_STRENGTH);
         config.flipFaceButtons = prefs.getBoolean(FLIP_FACE_BUTTONS_PREF_STRING, DEFAULT_FLIP_FACE_BUTTONS);
-        config.leftStickHoldY = prefs.getBoolean(LEFT_STICK_HOLD_Y_PREF_STRING, false);
-        config.ltToggle = prefs.getBoolean(LT_TOGGLE_PREF_STRING, false);
+        config.leftStickHoldY = prefs.getBoolean(LEFT_STICK_HOLD_Y_PREF_STRING, true);
+        config.ltToggle = prefs.getBoolean(LT_TOGGLE_PREF_STRING, true);
         config.touchscreenTrackpad = prefs.getBoolean(TOUCHSCREEN_TRACKPAD_PREF_STRING, DEFAULT_TOUCHSCREEN_TRACKPAD);
         config.enableLatencyToast = prefs.getBoolean(LATENCY_TOAST_PREF_STRING, DEFAULT_LATENCY_TOAST);
         config.absoluteMouseMode = prefs.getBoolean(ABSOLUTE_MOUSE_MODE_PREF_STRING, DEFAULT_ABSOLUTE_MOUSE_MODE);

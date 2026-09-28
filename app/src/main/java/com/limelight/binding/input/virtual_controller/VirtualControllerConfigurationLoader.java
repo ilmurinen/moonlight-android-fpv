@@ -445,8 +445,8 @@ public class VirtualControllerConfigurationLoader {
             int height,
             int rightDisplacement) {
 
-        // Left stick retains throttle (Y) while X returns to center.
-        controller.addElement(createLeftStick(controller, context, true, 0,
+        // Throttle hold is shared with the standard layout and remains user-configurable.
+        controller.addElement(createLeftStick(controller, context, config.leftStickHoldY, 0,
                         VirtualControllerElement.EID_FS_LS, true),
                 screenScale(ANALOG_L_BASE_X, height),
                 screenScale(ANALOG_R_BASE_Y, height),
@@ -474,7 +474,7 @@ public class VirtualControllerConfigurationLoader {
         // ARM — toggle for leftTrigger
         LeftTrigger armBtn = new LeftTrigger(controller, VirtualControllerElement.EID_FS_ARM, 1, context);
         armBtn.setText("ARM");
-        armBtn.setToggleMode(true);
+        armBtn.setToggleMode(config.ltToggle);
         armBtn.setPressed(controller.getControllerInputContext().leftTrigger != 0);
         controller.addElement(armBtn,
                 startX + buttonSpacing * 0,

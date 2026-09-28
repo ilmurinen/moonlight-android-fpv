@@ -24,6 +24,12 @@ You can follow development on our [Discord server](https://moonlight-stream.org/
 * In moonlight-android/, create a file called ‘local.properties’. Add an ‘ndk.dir=’ property to the local.properties file and set it equal to your NDK directory.
 * Build the APK using Android Studio or gradle
 
+## On-screen Controls
+
+In Settings → On-screen Controls, **Show on-screen controls** controls the visibility of the virtual controller, while **Use FPV controller layout** selects which controls are shown. Appearance and behavior settings remain available when the overlay is hidden.
+
+Changing to the FPV layout enables left-stick throttle hold and LT/ARM toggle by default. Changing back to the standard layout disables both. These options can be manually changed afterward and remain so until the layout is changed again.
+
 ## Authors
 
 * [Cameron Gutman](https://github.com/cgutman)  
