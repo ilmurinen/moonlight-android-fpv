@@ -14,6 +14,11 @@ public class RightAnalogStick extends AnalogStick {
     }
 
     public RightAnalogStick(final VirtualController controller, final Context context, int elementId) {
+        this(controller, context, elementId, false);
+    }
+
+    public RightAnalogStick(final VirtualController controller, final Context context, int elementId,
+                            boolean mapToLeftStick) {
         super(controller, context, elementId);
 
         addAnalogStickListener(new AnalogStick.AnalogStickListener() {
@@ -21,8 +26,13 @@ public class RightAnalogStick extends AnalogStick {
             public void onMovement(float x, float y) {
                 VirtualController.ControllerInputContext inputContext =
                         controller.getControllerInputContext();
-                inputContext.rightStickX = (short) (x * 0x7FFE);
-                inputContext.rightStickY = (short) (y * 0x7FFE);
+                if (mapToLeftStick) {
+                    inputContext.leftStickX = (short) (x * 0x7FFE);
+                    inputContext.leftStickY = (short) (y * 0x7FFE);
+                } else {
+                    inputContext.rightStickX = (short) (x * 0x7FFE);
+                    inputContext.rightStickY = (short) (y * 0x7FFE);
+                }
 
                 controller.sendControllerInputContext();
             }
@@ -35,7 +45,8 @@ public class RightAnalogStick extends AnalogStick {
             public void onDoubleClick() {
                 VirtualController.ControllerInputContext inputContext =
                         controller.getControllerInputContext();
-                inputContext.inputMap |= ControllerPacket.RS_CLK_FLAG;
+                inputContext.inputMap |= mapToLeftStick ?
+                        ControllerPacket.LS_CLK_FLAG : ControllerPacket.RS_CLK_FLAG;
 
                 controller.sendControllerInputContext();
             }
@@ -44,7 +55,8 @@ public class RightAnalogStick extends AnalogStick {
             public void onRevoke() {
                 VirtualController.ControllerInputContext inputContext =
                         controller.getControllerInputContext();
-                inputContext.inputMap &= ~ControllerPacket.RS_CLK_FLAG;
+                inputContext.inputMap &= ~(mapToLeftStick ?
+                        ControllerPacket.LS_CLK_FLAG : ControllerPacket.RS_CLK_FLAG);
 
                 controller.sendControllerInputContext();
             }

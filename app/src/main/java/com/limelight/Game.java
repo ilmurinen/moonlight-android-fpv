@@ -75,6 +75,7 @@ import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -146,6 +147,9 @@ public class Game extends Activity implements SurfaceHolder.Callback,
     private TextView notificationOverlayView;
     private int requestedNotificationOverlayVisibility = View.GONE;
     private TextView performanceOverlayView;
+    private LinearLayout compactPerformanceOverlayView;
+    private TextView compactPerformanceOverlayHeaderView;
+    private TextView compactPerformanceOverlayDetailsView;
 
     private MediaCodecDecoderRenderer decoderRenderer;
     private boolean reportedCrash;
@@ -271,6 +275,9 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         notificationOverlayView = findViewById(R.id.notificationOverlay);
 
         performanceOverlayView = findViewById(R.id.performanceOverlay);
+        compactPerformanceOverlayView = findViewById(R.id.compactPerformanceOverlay);
+        compactPerformanceOverlayHeaderView = findViewById(R.id.performanceOverlayCompactHeader);
+        compactPerformanceOverlayDetailsView = findViewById(R.id.performanceOverlayCompactDetails);
 
         inputCaptureProvider = InputCaptureManager.getInputCaptureProvider(this, this);
 
@@ -370,7 +377,14 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
         // Check if the user has enabled performance stats overlay
         if (prefConfig.enablePerfOverlay) {
-            performanceOverlayView.setVisibility(View.VISIBLE);
+            if (prefConfig.compactPerfOverlay) {
+                compactPerformanceOverlayHeaderView.setSelected(true);
+                compactPerformanceOverlayDetailsView.setSelected(true);
+                compactPerformanceOverlayView.setVisibility(View.VISIBLE);
+            }
+            else {
+                performanceOverlayView.setVisibility(View.VISIBLE);
+            }
         }
 
         decoderRenderer = new MediaCodecDecoderRenderer(
@@ -596,6 +610,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
                 }
 
                 performanceOverlayView.setVisibility(View.GONE);
+                compactPerformanceOverlayView.setVisibility(View.GONE);
                 notificationOverlayView.setVisibility(View.GONE);
 
                 // Disable sensors while in PiP mode
@@ -614,7 +629,12 @@ public class Game extends Activity implements SurfaceHolder.Callback,
                 }
 
                 if (prefConfig.enablePerfOverlay) {
-                    performanceOverlayView.setVisibility(View.VISIBLE);
+                    if (prefConfig.compactPerfOverlay) {
+                        compactPerformanceOverlayView.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                        performanceOverlayView.setVisibility(View.VISIBLE);
+                    }
                 }
 
                 notificationOverlayView.setVisibility(requestedNotificationOverlayVisibility);
@@ -2641,7 +2661,20 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                performanceOverlayView.setText(text);
+                if (prefConfig.compactPerfOverlay) {
+                    int lineBreak = text.indexOf('\n');
+                    if (lineBreak >= 0) {
+                        compactPerformanceOverlayHeaderView.setText(text.substring(0, lineBreak));
+                        compactPerformanceOverlayDetailsView.setText(text.substring(lineBreak + 1));
+                    }
+                    else {
+                        compactPerformanceOverlayHeaderView.setText(text);
+                        compactPerformanceOverlayDetailsView.setText("");
+                    }
+                }
+                else {
+                    performanceOverlayView.setText(text);
+                }
             }
         });
     }

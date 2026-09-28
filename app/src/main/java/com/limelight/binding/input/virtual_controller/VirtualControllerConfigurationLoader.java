@@ -169,12 +169,23 @@ public class VirtualControllerConfigurationLoader {
             boolean holdYAxis,
             int deadZonePercent,
             int elementId) {
-        LeftAnalogStick stick = new LeftAnalogStick(controller, context, elementId);
+        return createLeftStick(controller, context, holdYAxis, deadZonePercent, elementId, false);
+    }
+
+    private static AnalogStick createLeftStick(
+            final VirtualController controller,
+            final Context context,
+            boolean holdYAxis,
+            int deadZonePercent,
+            int elementId,
+            boolean mapToRightStick) {
+        LeftAnalogStick stick = new LeftAnalogStick(controller, context, elementId, mapToRightStick);
         stick.setHoldYAxis(holdYAxis);
         stick.setDeadZonePercent(deadZonePercent);
         VirtualController.ControllerInputContext input = controller.getControllerInputContext();
-        stick.setInputPosition(input.leftStickX / (float) 0x7FFE,
-                input.leftStickY / (float) 0x7FFE);
+        stick.setInputPosition(
+                (mapToRightStick ? -input.rightStickY : input.leftStickX) / (float) 0x7FFE,
+                (mapToRightStick ? input.rightStickX : input.leftStickY) / (float) 0x7FFE);
         return stick;
     }
 
@@ -197,11 +208,26 @@ public class VirtualControllerConfigurationLoader {
             final Context context,
             int deadZonePercent,
             int elementId) {
-        RightAnalogStick stick = new RightAnalogStick(controller, context, elementId);
+        return createRightStick(controller, context, deadZonePercent, elementId, false);
+    }
+
+    private static AnalogStick createRightStick(
+            final VirtualController controller,
+            final Context context,
+            int deadZonePercent,
+            int elementId,
+            boolean mapToLeftStick) {
+        RightAnalogStick stick = new RightAnalogStick(
+                controller, context, elementId, mapToLeftStick);
         stick.setDeadZonePercent(deadZonePercent);
         VirtualController.ControllerInputContext input = controller.getControllerInputContext();
-        stick.setInputPosition(input.rightStickX / (float) 0x7FFE,
-                input.rightStickY / (float) 0x7FFE);
+        if (mapToLeftStick) {
+            stick.setInputPosition(input.leftStickX / (float) 0x7FFE,
+                    input.leftStickY / (float) 0x7FFE);
+        } else {
+            stick.setInputPosition(input.rightStickX / (float) 0x7FFE,
+                    input.rightStickY / (float) 0x7FFE);
+        }
         return stick;
     }
 
@@ -421,16 +447,16 @@ public class VirtualControllerConfigurationLoader {
 
         // Left stick retains throttle (Y) while X returns to center.
         controller.addElement(createLeftStick(controller, context, true, 0,
-                        VirtualControllerElement.EID_FS_LS),
+                        VirtualControllerElement.EID_FS_LS, true),
                 screenScale(ANALOG_L_BASE_X, height),
-                screenScale(ANALOG_L_BASE_Y, height),
+                screenScale(ANALOG_R_BASE_Y, height),
                 screenScale(ANALOG_SIZE, height),
                 screenScale(ANALOG_SIZE, height)
         );
 
         // Both flight sticks use zero deadzone.
         controller.addElement(createRightStick(controller, context, 0,
-                        VirtualControllerElement.EID_FS_RS),
+                        VirtualControllerElement.EID_FS_RS, true),
                 screenScale(ANALOG_R_BASE_X, height) + rightDisplacement,
                 screenScale(ANALOG_R_BASE_Y, height),
                 screenScale(ANALOG_SIZE, height),
@@ -455,20 +481,18 @@ public class VirtualControllerConfigurationLoader {
                 buttonY, buttonW, buttonH
         );
 
-        // BRAKE — toggle for rightTrigger
-        RightTrigger brakeBtn = new RightTrigger(controller, VirtualControllerElement.EID_FS_BRAKE, 1, context);
-        brakeBtn.setText("BRAKE");
-        brakeBtn.setToggleMode(true);
-        brakeBtn.setPressed(controller.getControllerInputContext().rightTrigger != 0);
-        controller.addElement(brakeBtn,
+        // FLIP — momentary A button
+        controller.addElement(createDigitalButton(
+                VirtualControllerElement.EID_FS_BRAKE,
+                ControllerPacket.A_FLAG, 0, 1, "FLIP", -1, controller, context),
                 startX + buttonSpacing * 1,
                 buttonY, buttonW, buttonH
         );
 
-        // FIRE — momentary A button
+        // RESET — momentary B button
         controller.addElement(createDigitalButton(
                 VirtualControllerElement.EID_FS_FIRE,
-                ControllerPacket.A_FLAG, 0, 1, "FIRE", -1, controller, context),
+                ControllerPacket.B_FLAG, 0, 1, "RESET", -1, controller, context),
                 startX + buttonSpacing * 2,
                 buttonY, buttonW, buttonH
         );

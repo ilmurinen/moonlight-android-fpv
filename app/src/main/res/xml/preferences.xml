@@ -147,13 +147,11 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/category_on_screen_controls_settings"
         android:key="category_onscreen_controls">
-        <ListPreference
-            android:key="list_osc_layout"
+        <CheckBoxPreference
+            android:key="checkbox_fpv_layout"
             android:title="@string/title_osc_layout"
             android:summary="@string/summary_osc_layout"
-            android:entries="@array/osc_layout_names"
-            android:entryValues="@array/osc_layout_values"
-            android:defaultValue="default" />
+            android:defaultValue="true" />
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="checkbox_show_onscreen_controls"
@@ -281,6 +279,12 @@
             android:key="checkbox_enable_perf_overlay"
             android:title="@string/title_enable_perf_overlay"
             android:summary="@string/summary_enable_perf_overlay"
+            android:defaultValue="false"/>
+        <CheckBoxPreference
+            android:key="checkbox_compact_perf_overlay"
+            android:dependency="checkbox_enable_perf_overlay"
+            android:title="@string/title_compact_perf_overlay"
+            android:summary="@string/summary_compact_perf_overlay"
             android:defaultValue="false"/>
         <CheckBoxPreference
             android:key="checkbox_enable_post_stream_toast"

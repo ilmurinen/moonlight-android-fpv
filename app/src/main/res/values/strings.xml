@@ -113,6 +113,8 @@
     <string name="perf_overlay_netdrops">Frames dropped by your network connection: %1$.2f%%</string>
     <string name="perf_overlay_netlatency">Average network latency: %1$d ms (variance: %2$d ms)</string>
     <string name="perf_overlay_dectime">Average decoding time: %1$.2f ms</string>
+    <string name="perf_overlay_compact">%1$s %2$.2f FPS | %3$s\nIn %4$.2f FPS | Out %5$.2f FPS | Drop %6$.2f%% | RTT %7$d+/- %8$dms | Dec %9$.2fms</string>
+    <string name="perf_overlay_compact_host"> | Host %1$.1f/%2$.1f/%3$.1fms</string>
 
     <!-- AppList activity -->
     <string name="applist_connect_msg">Connecting to PC…</string>
@@ -215,8 +217,8 @@
     <string name="summary_left_stick_hold_y">Left analog stick Y-axis will not return to center when released (for flight simulators)</string>
     <string name="title_lt_toggle">LT button is a toggle</string>
     <string name="summary_lt_toggle">LT stays pressed until tapped again (for flight sim arm control)</string>
-    <string name="title_osc_layout">On-screen controller layout</string>
-    <string name="summary_osc_layout">Choose the layout for the on-screen controller</string>
+    <string name="title_osc_layout">FPV controller layout</string>
+    <string name="summary_osc_layout">Enable the FPV flight-sim controller layout and on-screen controls</string>
     <string name="title_reset_osc">Clear saved on-screen controls layout</string>
     <string name="summary_reset_osc">Resets all on-screen controls to their default size and position</string>
     <string name="dialog_title_reset_osc">Reset Layout</string>
@@ -258,6 +260,8 @@
     <string name="summary_full_range">This will cause loss of detail in light and dark areas if your device doesn\'t properly display full range video content.</string>
     <string name="title_enable_perf_overlay">Show performance stats while streaming</string>
     <string name="summary_enable_perf_overlay">Display real-time stream performance information while streaming</string>
+    <string name="title_compact_perf_overlay">Display compact stats</string>
+    <string name="summary_compact_perf_overlay">Show performance stats in two compact lines</string>
     <string name="title_enable_post_stream_toast">Show latency message after streaming</string>
     <string name="summary_enable_post_stream_toast">Display a latency information message after the stream ends</string>
 
