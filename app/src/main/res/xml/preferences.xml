@@ -147,6 +147,13 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/category_on_screen_controls_settings"
         android:key="category_onscreen_controls">
+        <ListPreference
+            android:key="list_osc_layout"
+            android:title="@string/title_osc_layout"
+            android:summary="@string/summary_osc_layout"
+            android:entries="@array/osc_layout_names"
+            android:entryValues="@array/osc_layout_values"
+            android:defaultValue="default" />
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="checkbox_show_onscreen_controls"
@@ -172,6 +179,18 @@
             android:key="checkbox_show_guide_button"
             android:summary="@string/summary_show_guide_button"
             android:title="@string/title_show_guide_button" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:dependency="checkbox_show_onscreen_controls"
+            android:key="checkbox_left_stick_hold_y"
+            android:title="@string/title_left_stick_hold_y"
+            android:summary="@string/summary_left_stick_hold_y" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:dependency="checkbox_show_onscreen_controls"
+            android:key="checkbox_lt_toggle"
+            android:title="@string/title_lt_toggle"
+            android:summary="@string/summary_lt_toggle" />
         <com.limelight.preferences.SeekBarPreference
             android:key="seekbar_osc_opacity"
             android:dependency="checkbox_show_onscreen_controls"

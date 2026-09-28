@@ -211,6 +211,12 @@
     <string name="summary_only_l3r3">Hide all virtual buttons except L3 and R3</string>
     <string name="title_show_guide_button">Show Guide Button</string>
     <string name="summary_show_guide_button">Show the guide button on screen</string>
+    <string name="title_left_stick_hold_y">Left stick throttle mode</string>
+    <string name="summary_left_stick_hold_y">Left analog stick Y-axis will not return to center when released (for flight simulators)</string>
+    <string name="title_lt_toggle">LT button is a toggle</string>
+    <string name="summary_lt_toggle">LT stays pressed until tapped again (for flight sim arm control)</string>
+    <string name="title_osc_layout">On-screen controller layout</string>
+    <string name="summary_osc_layout">Choose the layout for the on-screen controller</string>
     <string name="title_reset_osc">Clear saved on-screen controls layout</string>
     <string name="summary_reset_osc">Resets all on-screen controls to their default size and position</string>
     <string name="dialog_title_reset_osc">Reset Layout</string>

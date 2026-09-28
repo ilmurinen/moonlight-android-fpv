@@ -37,6 +37,14 @@ public abstract class VirtualControllerElement extends View {
     public static final int EID_RSB = 15;
     public static final int EID_GDB = 16;
 
+    // Flight sim layout element IDs
+    public static final int EID_FS_ARM = 17;
+    public static final int EID_FS_BRAKE = 18;
+    public static final int EID_FS_FIRE = 19;
+    public static final int EID_FS_SEC = 20;
+    public static final int EID_FS_LS = 21;
+    public static final int EID_FS_RS = 22;
+
     protected VirtualController virtualController;
     protected final int elementId;
 
@@ -289,6 +297,9 @@ public abstract class VirtualControllerElement extends View {
     abstract protected void onElementDraw(Canvas canvas);
 
     abstract public boolean onElementTouchEvent(MotionEvent event);
+
+    void releaseForLayoutChange() {
+    }
 
     protected static final void _DBG(String text) {
         if (_PRINT_DEBUG_INFORMATION) {

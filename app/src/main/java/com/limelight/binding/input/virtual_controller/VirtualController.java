@@ -120,6 +120,7 @@ public class VirtualController {
 
     public void removeElements() {
         for (VirtualControllerElement element : elements) {
+            element.releaseForLayoutChange();
             frame_layout.removeView(element);
         }
         elements.clear();
@@ -211,5 +212,11 @@ public class VirtualController {
         handler.postDelayed(delayedRetransmitRunnable, 25);
         handler.postDelayed(delayedRetransmitRunnable, 50);
         handler.postDelayed(delayedRetransmitRunnable, 75);
+    }
+
+    public void sendKeyboardInput(short keyMap, byte keyDirection, byte modifier, byte flags) {
+        if (controllerHandler != null) {
+            controllerHandler.sendKeyboardInput(keyMap, keyDirection, modifier, flags);
+        }
     }
 }

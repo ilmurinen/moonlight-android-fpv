@@ -93,6 +93,22 @@ public class AnalogStick extends VirtualControllerElement {
     private boolean circle_stick = true; // TODO: implement square sick for simulations
 
     /**
+     * When true, the Y-axis position is held on release instead of returning to center.
+     * Useful for throttle controls in flight/space simulators.
+     */
+    private boolean holdYAxis = false;
+
+    private int deadZonePercent = 30;
+
+    /**
+     * Last Y-axis movement value sent when holdYAxis is active.
+     */
+    private float lastMovementY = 0;
+
+    private float normalizedPositionX = 0;
+    private float normalizedPositionY = 0;
+
+    /**
      * outer radius, this size will be automatically updated on resize
      */
     private float radius_complete = 0;
@@ -175,6 +191,30 @@ public class AnalogStick extends VirtualControllerElement {
         listeners.add(listener);
     }
 
+    public void setHoldYAxis(boolean holdYAxis) {
+        this.holdYAxis = holdYAxis;
+    }
+
+    public void setDeadZonePercent(int deadZonePercent) {
+        this.deadZonePercent = Math.max(0, Math.min(100, deadZonePercent));
+        radius_dead_zone = getPercent(getCorrectWidth() / 2, this.deadZonePercent);
+        invalidate();
+    }
+
+    public void setInputPosition(float x, float y) {
+        normalizedPositionX = Math.max(-1, Math.min(1, x));
+        normalizedPositionY = Math.max(-1, Math.min(1, y));
+        lastMovementY = normalizedPositionY;
+        updateRenderedPosition();
+        invalidate();
+    }
+
+    private void updateRenderedPosition() {
+        float complete = radius_complete - radius_analog_stick;
+        position_stick_x = getWidth() / 2 + normalizedPositionX * complete;
+        position_stick_y = getHeight() / 2 - normalizedPositionY * complete;
+    }
+
     private void notifyOnMovement(float x, float y) {
         _DBG("movement x: " + x + " movement y: " + y);
         // notify listeners
@@ -211,8 +251,9 @@ public class AnalogStick extends VirtualControllerElement {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         // calculate new radius sizes depending
         radius_complete = getPercent(getCorrectWidth() / 2, 100) - 2 * getDefaultStrokeWidth();
-        radius_dead_zone = getPercent(getCorrectWidth() / 2, 30);
+        radius_dead_zone = getPercent(getCorrectWidth() / 2, deadZonePercent);
         radius_analog_stick = getPercent(getCorrectWidth() / 2, 20);
+        updateRenderedPosition();
 
         super.onSizeChanged(w, h, oldw, oldh);
     }
@@ -235,13 +276,20 @@ public class AnalogStick extends VirtualControllerElement {
 
         paint.setColor(getDefaultColor());
         // draw dead zone
-        canvas.drawCircle(getWidth() / 2, getHeight() / 2, radius_dead_zone, paint);
+        if (radius_dead_zone > 0) {
+            canvas.drawCircle(getWidth() / 2, getHeight() / 2, radius_dead_zone, paint);
+        }
 
         // draw stick depending on state
         switch (stick_state) {
             case NO_MOVEMENT: {
-                paint.setColor(getDefaultColor());
-                canvas.drawCircle(getWidth() / 2, getHeight() / 2, radius_analog_stick, paint);
+                if (holdYAxis) {
+                    paint.setColor(getDefaultColor());
+                    canvas.drawCircle(position_stick_x, position_stick_y, radius_analog_stick, paint);
+                } else {
+                    paint.setColor(getDefaultColor());
+                    canvas.drawCircle(getWidth() / 2, getHeight() / 2, radius_analog_stick, paint);
+                }
                 break;
             }
             case MOVED_IN_DEAD_ZONE:
@@ -269,14 +317,18 @@ public class AnalogStick extends VirtualControllerElement {
         // giving analog stick input and we don't want to snap back into the deadzone.
         // We also release the deadzone if the user keeps the stick pressed for a bit to allow
         // them to make precise movements.
-        stick_state = (stick_state == STICK_STATE.MOVED_ACTIVE ||
+        stick_state = (deadZonePercent == 0 ||
+                stick_state == STICK_STATE.MOVED_ACTIVE ||
                 eventTime - timeLastClick > timeoutDeadzone ||
                 movement_radius > radius_dead_zone) ?
                 STICK_STATE.MOVED_ACTIVE : STICK_STATE.MOVED_IN_DEAD_ZONE;
 
         //  trigger move event if state active
         if (stick_state == STICK_STATE.MOVED_ACTIVE) {
-            notifyOnMovement(-correlated_x / complete, correlated_y / complete);
+            normalizedPositionX = -correlated_x / complete;
+            normalizedPositionY = correlated_y / complete;
+            lastMovementY = normalizedPositionY;
+            notifyOnMovement(normalizedPositionX, normalizedPositionY);
         }
     }
 
@@ -338,12 +390,43 @@ public class AnalogStick extends VirtualControllerElement {
             stick_state = STICK_STATE.NO_MOVEMENT;
             notifyOnRevoke();
 
-            // not longer pressed reset analog stick
-            notifyOnMovement(0, 0);
+            if (holdYAxis) {
+                // Keep Y-axis position (throttle mode for flight simulators)
+                normalizedPositionX = 0;
+                updateRenderedPosition();
+                notifyOnMovement(0, lastMovementY);
+            } else {
+                // not longer pressed reset analog stick
+                normalizedPositionX = 0;
+                normalizedPositionY = 0;
+                updateRenderedPosition();
+                notifyOnMovement(0, 0);
+            }
         }
         // refresh view
         invalidate();
         // accept the touch event
         return true;
+    }
+
+    @Override
+    void releaseForLayoutChange() {
+        if (!isPressed()) {
+            return;
+        }
+
+        setPressed(false);
+        stick_state = STICK_STATE.NO_MOVEMENT;
+        notifyOnRevoke();
+        if (holdYAxis) {
+            normalizedPositionX = 0;
+            updateRenderedPosition();
+            notifyOnMovement(0, lastMovementY);
+        } else {
+            normalizedPositionX = 0;
+            normalizedPositionY = 0;
+            updateRenderedPosition();
+            notifyOnMovement(0, 0);
+        }
     }
 }

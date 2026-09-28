@@ -2804,6 +2804,10 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
         sendControllerInputPacket(defaultContext);
     }
 
+    public void sendKeyboardInput(short keyMap, byte keyDirection, byte modifier, byte flags) {
+        conn.sendKeyboardInput(keyMap, keyDirection, modifier, flags);
+    }
+
     @Override
     public void reportControllerState(int controllerId, int buttonFlags,
                                       float leftStickX, float leftStickY,

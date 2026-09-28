@@ -58,12 +58,18 @@ public class DigitalButton extends VirtualControllerElement {
     private int layer;
     private DigitalButton movingButton = null;
 
+    private boolean toggleMode = false;
+
     boolean inRange(float x, float y) {
         return (this.getX() < x && this.getX() + this.getWidth() > x) &&
                 (this.getY() < y && this.getY() + this.getHeight() > y);
     }
 
     public boolean checkMovement(float x, float y, DigitalButton movingButton) {
+        if (toggleMode) {
+            return false;
+        }
+
         // check if the movement happened in the same layer
         if (movingButton.layer != this.layer) {
             return false;
@@ -131,6 +137,10 @@ public class DigitalButton extends VirtualControllerElement {
     public void setIcon(int id) {
         this.icon = id;
         invalidate();
+    }
+
+    public void setToggleMode(boolean toggleMode) {
+        this.toggleMode = toggleMode;
     }
 
     @Override
@@ -201,27 +211,44 @@ public class DigitalButton extends VirtualControllerElement {
 
         switch (action) {
             case MotionEvent.ACTION_DOWN: {
-                movingButton = null;
-                setPressed(true);
-                onClickCallback();
+                if (toggleMode) {
+                    // Toggle latch behavior
+                    setPressed(!isPressed());
+                    virtualController.getHandler().removeCallbacks(longClickRunnable);
+                    for (DigitalButtonListener listener : listeners) {
+                        if (isPressed()) {
+                            listener.onClick();
+                        } else {
+                            listener.onRelease();
+                        }
+                    }
+                } else {
+                    movingButton = null;
+                    setPressed(true);
+                    onClickCallback();
+                }
 
                 invalidate();
 
                 return true;
             }
             case MotionEvent.ACTION_MOVE: {
-                checkMovementForAllButtons(x, y);
+                if (!toggleMode) {
+                    checkMovementForAllButtons(x, y);
+                }
 
                 return true;
             }
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP: {
-                setPressed(false);
-                onReleaseCallback();
+                if (!toggleMode) {
+                    setPressed(false);
+                    onReleaseCallback();
 
-                checkMovementForAllButtons(x, y);
+                    checkMovementForAllButtons(x, y);
 
-                invalidate();
+                    invalidate();
+                }
 
                 return true;
             }
@@ -229,5 +256,15 @@ public class DigitalButton extends VirtualControllerElement {
             }
         }
         return true;
+    }
+
+    @Override
+    void releaseForLayoutChange() {
+        virtualController.getHandler().removeCallbacks(longClickRunnable);
+        if (!toggleMode && isPressed()) {
+            setPressed(false);
+            onReleaseCallback();
+            invalidate();
+        }
     }
 }

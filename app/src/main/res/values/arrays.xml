@@ -131,4 +131,12 @@
         <item>right</item>
         <item>left</item>
     </string-array>
+    <string-array name="osc_layout_names">
+        <item>Default</item>
+        <item>Flight Sim</item>
+    </string-array>
+    <string-array name="osc_layout_values" translatable="false">
+        <item>default</item>
+        <item>flight_sim</item>
+    </string-array>
 </resources>

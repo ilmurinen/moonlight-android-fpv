@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.util.DisplayMetrics;
 
 import com.limelight.nvstream.input.ControllerPacket;
+import com.limelight.nvstream.input.KeyboardPacket;
 import com.limelight.preferences.PreferenceConfiguration;
 
 import org.json.JSONException;
@@ -123,10 +124,13 @@ public class VirtualControllerConfigurationLoader {
             final String text,
             final int icon,
             final VirtualController controller,
-            final Context context) {
+            final Context context,
+            boolean toggleMode) {
         LeftTrigger button = new LeftTrigger(controller, layer, context);
         button.setText(text);
         button.setIcon(icon);
+        button.setToggleMode(toggleMode);
+        button.setPressed(controller.getControllerInputContext().leftTrigger != 0);
         return button;
     }
 
@@ -139,19 +143,66 @@ public class VirtualControllerConfigurationLoader {
         RightTrigger button = new RightTrigger(controller, layer, context);
         button.setText(text);
         button.setIcon(icon);
+        button.setPressed(controller.getControllerInputContext().rightTrigger != 0);
         return button;
     }
 
     private static AnalogStick createLeftStick(
             final VirtualController controller,
-            final Context context) {
-        return new LeftAnalogStick(controller, context);
+            final Context context,
+            boolean holdYAxis) {
+        return createLeftStick(controller, context, holdYAxis, 30);
+    }
+
+    private static AnalogStick createLeftStick(
+            final VirtualController controller,
+            final Context context,
+            boolean holdYAxis,
+            int deadZonePercent) {
+        return createLeftStick(controller, context, holdYAxis, deadZonePercent,
+                VirtualControllerElement.EID_LS);
+    }
+
+    private static AnalogStick createLeftStick(
+            final VirtualController controller,
+            final Context context,
+            boolean holdYAxis,
+            int deadZonePercent,
+            int elementId) {
+        LeftAnalogStick stick = new LeftAnalogStick(controller, context, elementId);
+        stick.setHoldYAxis(holdYAxis);
+        stick.setDeadZonePercent(deadZonePercent);
+        VirtualController.ControllerInputContext input = controller.getControllerInputContext();
+        stick.setInputPosition(input.leftStickX / (float) 0x7FFE,
+                input.leftStickY / (float) 0x7FFE);
+        return stick;
     }
 
     private static AnalogStick createRightStick(
             final VirtualController controller,
             final Context context) {
-        return new RightAnalogStick(controller, context);
+        return createRightStick(controller, context, 30);
+    }
+
+    private static AnalogStick createRightStick(
+            final VirtualController controller,
+            final Context context,
+            int deadZonePercent) {
+        return createRightStick(controller, context, deadZonePercent,
+                VirtualControllerElement.EID_RS);
+    }
+
+    private static AnalogStick createRightStick(
+            final VirtualController controller,
+            final Context context,
+            int deadZonePercent,
+            int elementId) {
+        RightAnalogStick stick = new RightAnalogStick(controller, context, elementId);
+        stick.setDeadZonePercent(deadZonePercent);
+        VirtualController.ControllerInputContext input = controller.getControllerInputContext();
+        stick.setInputPosition(input.rightStickX / (float) 0x7FFE,
+                input.rightStickY / (float) 0x7FFE);
+        return stick;
     }
 
 
@@ -189,6 +240,12 @@ public class VirtualControllerConfigurationLoader {
     private static final int GUIDE_X = START_X-BACK_X;
     private static final int GUIDE_Y = START_BACK_Y;
 
+    // Flight sim layout constants
+    private static final int FS_BUTTONS_BASE_Y = 60;
+    private static final int FS_BUTTON_WIDTH = 12;
+    private static final int FS_BUTTON_HEIGHT = 9;
+    private static final int FS_BUTTON_SPACING = 17; // 12 + 5 gap
+
     public static void createDefaultLayout(final VirtualController controller, final Context context) {
 
         DisplayMetrics screen = context.getResources().getDisplayMetrics();
@@ -198,6 +255,11 @@ public class VirtualControllerConfigurationLoader {
         int rightDisplacement = screen.widthPixels - screen.heightPixels * 16 / 9;
 
         int height = screen.heightPixels;
+
+        if (config.oscLayout.equals("flight_sim")) {
+            createFlightSimLayout(controller, context, config, height, rightDisplacement);
+            return;
+        }
 
         // NOTE: Some of these getPercent() expressions seem like they can be combined
         // into a single call. Due to floating point rounding, this isn't actually possible.
@@ -252,7 +314,7 @@ public class VirtualControllerConfigurationLoader {
             );
 
             controller.addElement(createLeftTrigger(
-                    1, "LT", -1, controller, context),
+                    1, "LT", -1, controller, context, config.ltToggle),
                     screenScale(TRIGGER_L_BASE_X, height),
                     screenScale(TRIGGER_BASE_Y, height),
                     screenScale(TRIGGER_WIDTH, height),
@@ -285,7 +347,7 @@ public class VirtualControllerConfigurationLoader {
                     screenScale(TRIGGER_HEIGHT, height)
             );
 
-            controller.addElement(createLeftStick(controller, context),
+            controller.addElement(createLeftStick(controller, context, config.leftStickHoldY),
                     screenScale(ANALOG_L_BASE_X, height),
                     screenScale(ANALOG_L_BASE_Y, height),
                     screenScale(ANALOG_SIZE, height),
@@ -346,6 +408,93 @@ public class VirtualControllerConfigurationLoader {
                     screenScale(START_BACK_HEIGHT, height)
             );
         }
+
+        controller.setOpacity(config.oscOpacity);
+    }
+
+    private static void createFlightSimLayout(
+            final VirtualController controller,
+            final Context context,
+            final PreferenceConfiguration config,
+            int height,
+            int rightDisplacement) {
+
+        // Left stick retains throttle (Y) while X returns to center.
+        controller.addElement(createLeftStick(controller, context, true, 0,
+                        VirtualControllerElement.EID_FS_LS),
+                screenScale(ANALOG_L_BASE_X, height),
+                screenScale(ANALOG_L_BASE_Y, height),
+                screenScale(ANALOG_SIZE, height),
+                screenScale(ANALOG_SIZE, height)
+        );
+
+        // Both flight sticks use zero deadzone.
+        controller.addElement(createRightStick(controller, context, 0,
+                        VirtualControllerElement.EID_FS_RS),
+                screenScale(ANALOG_R_BASE_X, height) + rightDisplacement,
+                screenScale(ANALOG_R_BASE_Y, height),
+                screenScale(ANALOG_SIZE, height),
+                screenScale(ANALOG_SIZE, height)
+        );
+
+        // 4 buttons in a horizontal row at the bottom
+        int buttonY = screenScale(FS_BUTTONS_BASE_Y, height);
+        int buttonW = screenScale(FS_BUTTON_WIDTH, height);
+        int buttonH = screenScale(FS_BUTTON_HEIGHT, height);
+        int buttonSpacing = screenScale(FS_BUTTON_SPACING, height);
+        int rowWidth = buttonW * 4 + (buttonSpacing - buttonW) * 3;
+        int startX = (context.getResources().getDisplayMetrics().widthPixels - rowWidth) / 2;
+
+        // ARM — toggle for leftTrigger
+        LeftTrigger armBtn = new LeftTrigger(controller, VirtualControllerElement.EID_FS_ARM, 1, context);
+        armBtn.setText("ARM");
+        armBtn.setToggleMode(true);
+        armBtn.setPressed(controller.getControllerInputContext().leftTrigger != 0);
+        controller.addElement(armBtn,
+                startX + buttonSpacing * 0,
+                buttonY, buttonW, buttonH
+        );
+
+        // BRAKE — toggle for rightTrigger
+        RightTrigger brakeBtn = new RightTrigger(controller, VirtualControllerElement.EID_FS_BRAKE, 1, context);
+        brakeBtn.setText("BRAKE");
+        brakeBtn.setToggleMode(true);
+        brakeBtn.setPressed(controller.getControllerInputContext().rightTrigger != 0);
+        controller.addElement(brakeBtn,
+                startX + buttonSpacing * 1,
+                buttonY, buttonW, buttonH
+        );
+
+        // FIRE — momentary A button
+        controller.addElement(createDigitalButton(
+                VirtualControllerElement.EID_FS_FIRE,
+                ControllerPacket.A_FLAG, 0, 1, "FIRE", -1, controller, context),
+                startX + buttonSpacing * 2,
+                buttonY, buttonW, buttonH
+        );
+
+        // ESC — sends Escape key to host (for game menu)
+        DigitalButton escBtn = new DigitalButton(controller, VirtualControllerElement.EID_FS_SEC, 1, context);
+        escBtn.setText("ESC");
+        escBtn.addDigitalButtonListener(new DigitalButton.DigitalButtonListener() {
+            @Override
+            public void onClick() {
+                controller.sendKeyboardInput((short) 0x801B, KeyboardPacket.KEY_DOWN, (byte) 0, (byte) 0);
+            }
+
+            @Override
+            public void onLongClick() {
+            }
+
+            @Override
+            public void onRelease() {
+                controller.sendKeyboardInput((short) 0x801B, KeyboardPacket.KEY_UP, (byte) 0, (byte) 0);
+            }
+        });
+        controller.addElement(escBtn,
+                startX + buttonSpacing * 3,
+                buttonY, buttonW, buttonH
+        );
 
         controller.setOpacity(config.oscOpacity);
     }

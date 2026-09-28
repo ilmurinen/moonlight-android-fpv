@@ -58,6 +58,9 @@ public class PreferenceConfiguration {
     private static final String VIBRATE_FALLBACK_PREF_STRING = "checkbox_vibrate_fallback";
     private static final String VIBRATE_FALLBACK_STRENGTH_PREF_STRING = "seekbar_vibrate_fallback_strength";
     private static final String FLIP_FACE_BUTTONS_PREF_STRING = "checkbox_flip_face_buttons";
+    private static final String LEFT_STICK_HOLD_Y_PREF_STRING = "checkbox_left_stick_hold_y";
+    private static final String LT_TOGGLE_PREF_STRING = "checkbox_lt_toggle";
+    private static final String OSC_LAYOUT_PREF_STRING = "list_osc_layout";
     private static final String TOUCHSCREEN_TRACKPAD_PREF_STRING = "checkbox_touchscreen_trackpad";
     private static final String LATENCY_TOAST_PREF_STRING = "checkbox_enable_post_stream_toast";
     private static final String FRAME_PACING_PREF_STRING = "frame_pacing";
@@ -130,6 +133,9 @@ public class PreferenceConfiguration {
     public boolean stretchVideo, enableSops, playHostAudio, disableWarnings;
     public String language;
     public boolean smallIconMode, multiController, usbDriver, flipFaceButtons;
+    public boolean leftStickHoldY;
+    public boolean ltToggle;
+    public String oscLayout;
     public boolean onscreenController;
     public boolean onlyL3R3;
     public boolean showGuideButton;
@@ -592,6 +598,9 @@ public class PreferenceConfiguration {
         config.vibrateFallbackToDevice = prefs.getBoolean(VIBRATE_FALLBACK_PREF_STRING, DEFAULT_VIBRATE_FALLBACK);
         config.vibrateFallbackToDeviceStrength = prefs.getInt(VIBRATE_FALLBACK_STRENGTH_PREF_STRING, DEFAULT_VIBRATE_FALLBACK_STRENGTH);
         config.flipFaceButtons = prefs.getBoolean(FLIP_FACE_BUTTONS_PREF_STRING, DEFAULT_FLIP_FACE_BUTTONS);
+        config.leftStickHoldY = prefs.getBoolean(LEFT_STICK_HOLD_Y_PREF_STRING, false);
+        config.ltToggle = prefs.getBoolean(LT_TOGGLE_PREF_STRING, false);
+        config.oscLayout = prefs.getString(OSC_LAYOUT_PREF_STRING, "default");
         config.touchscreenTrackpad = prefs.getBoolean(TOUCHSCREEN_TRACKPAD_PREF_STRING, DEFAULT_TOUCHSCREEN_TRACKPAD);
         config.enableLatencyToast = prefs.getBoolean(LATENCY_TOAST_PREF_STRING, DEFAULT_LATENCY_TOAST);
         config.absoluteMouseMode = prefs.getBoolean(ABSOLUTE_MOUSE_MODE_PREF_STRING, DEFAULT_ABSOLUTE_MOUSE_MODE);
